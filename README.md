@@ -1,10 +1,10 @@
-# Company Policy Assistant (Spring AI + Ollama + Qdrant)
+# Company Policy Assistant (Spring AI + AWS Bedrock + Qdrant)
 
 A Spring Boot app that lets you **upload company policy PDFs** and then **ask questions** about them.  
 Under the hood it uses:
 
 - **Spring AI** for chat + embeddings
-- **Ollama** for local LLMs (`llama3.2:3b` by default)
+- **AWS Bedrock** to access OpenAI's `gpt-4o-mini` model for conversational answers and Amazon's `titan-embed-text-v2` for embeddings
 - **Qdrant** as a vector store for policy chunks
 
 ---
@@ -13,17 +13,26 @@ Under the hood it uses:
 
 ### 1) Prereqs
 - Docker + Docker Compose
+- AWS credentials with access to Amazon Bedrock (export `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and optionally `AWS_SESSION_TOKEN`)
+- Bedrock access to the OpenAI `gpt-4o-mini` model (and an embedding model such as `amazon.titan-embed-text-v2`)
 ### 2) Build and Start
 ```bash
 docker compose build
 docker compose up -d
 ```
 
-This brings up:
+The compose file starts:
 
-- ollama on http://localhost:11434
 - qdrant on http://localhost:6333 (HTTP) and grpc://localhost:6334 (gRPC)
-- app on http://localhost:8080
+- the Spring Boot app on http://localhost:8080 (configured to call AWS Bedrock)
+
+Before running `docker compose up` you can optionally create a `.env` file to override defaults:
+
+```env
+AWS_REGION=us-east-1
+CHAT_MODEL=openai.gpt-4o-mini
+EMBED_MODEL=amazon.titan-embed-text-v2
+```
 
 ## Endpoints
 
